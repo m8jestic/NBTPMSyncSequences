@@ -77,10 +77,6 @@ def binary_to_decimal(binary_array, rangeBits):
     return weightList
 
 
-def compute_hash(weights):
-    W = np.asarray(weights, dtype=int)
-    return hashlib.sha256(W.tobytes()).hexdigest()
-
 
 def get_parameter_sets_for_key_length(target_key_length=8192, bits_min=1, bits_max=13):
     parameter_sets = []
@@ -137,8 +133,13 @@ def _measure_chunk(args):
         while iter_ < max_iterations:
             iter_ += 1
             iterations += 1
-            X = np.random.randint(-M, M+1, [K, N])
+            if M> 1:
+                vals = np.r_[np.arange(-M, 0), np.arange(1, M + 1)]
+                X = np.random.choice(vals, size=(K, N))
+            else:
+                X = np.random.randint(-1, 2, [K, N])
 
+            X = np.asarray(X, dtype=TPM_A.weights.dtype)
             out_A = TPM_A.compute_output(X)
             out_B = TPM_B.compute_output(X)
 
